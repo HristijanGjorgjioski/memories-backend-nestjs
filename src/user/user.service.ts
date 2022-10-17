@@ -3,15 +3,28 @@ import { PrismaService } from '../prisma.service';
 import { User, Prisma } from '@prisma/client';
 import { UserLoginDto, UserRegisterDto } from './dto';
 import * as argon from 'argon2';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private jwt: JwtService) {}
 
   async signToken(
     userId: number,
     email: string,
-  ): Promise<{ access_token: string }> {}
+  ): Promise<{ access_token: string }> {
+    const payload = {
+      sub: userId,
+      email,
+    };
+
+    const access_token = await this.jwt.signAsync(payload, {
+      expiresIn: '1h',
+      secret: process.env.JWT_SECRET,
+    });
+
+    return { access_token };
+  }
 
   async register({ email, password, name }: UserRegisterDto): Promise<User> {
     return this.prisma.user.create({
