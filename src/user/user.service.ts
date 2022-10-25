@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { UserLoginDto, UserRegisterDto } from './dto';
+import { UserEditDto, UserLoginDto, UserRegisterDto } from './dto';
 import * as argon from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 
@@ -44,5 +44,20 @@ export class UserService {
     if (!passwordMatch) throw new ForbiddenException('Credentials Incorrect');
 
     return user;
+  }
+
+  async editUser(userId: number, dto: UserEditDto) {
+    const newUser = await this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        ...dto,
+      },
+    });
+
+    delete newUser.password;
+
+    return newUser;
   }
 }

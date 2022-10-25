@@ -17,4 +17,7 @@ export class UserController {
   register(@Body() dto: UserRegisterDto) {
     return this.userService.register(dto);
   }
+
+  // @Patch()
+  // editUser(@GetUser)
 }
